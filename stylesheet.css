@@ -1,0 +1,239 @@
+html, body {
+    height: 100%;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    background-color: #ffffff;
+    color: #111827;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+}
+
+header {
+    background-color: #ffffff;
+    padding: 12px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.encabezado-superior {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.grupo-marca {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.boton-menu {
+    background: none;
+    border: none;
+    color: #111827;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #111827;
+}
+
+.imagen-logo {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+}
+
+nav ul {
+    display: flex;
+    gap: 20px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li a {
+    color: #4b5563;
+    text-decoration: none;
+}
+
+nav ul li a:hover {
+    color: #25c200;
+}
+
+.acciones-encabezado {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.boton-consultar {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.boton-consultar:hover {
+    text-decoration: underline;
+}
+
+.boton-aplicacion {
+    background-color: #25c200;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    transition: background-color 0.2s ease;
+}
+
+.boton-aplicacion:hover {
+    background-color: #20a600;
+}
+
+.encabezado-busqueda {
+    width: 100%;
+}
+
+.caja-busqueda {
+    display: flex;
+    align-items: center;
+    background-color: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 8px 12px;
+    gap: 8px;
+}
+
+.icono-busqueda {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.caja-busqueda input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #111827;
+    width: 100%;
+    font-size: 0.9rem;
+}
+
+.caja-busqueda input::placeholder {
+    color: #9ca3af;
+}
+
+.sube { 
+    color: #10b981; 
+    font-weight: 500;
+}
+
+.baja { 
+    color: #ef4444; 
+    font-weight: 500;
+}
+
+.mercado {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 20px;
+}
+
+.tarjeta {
+    background-color: #f9fafb;
+    flex: 1 1 250px;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.tarjeta h3 {
+    margin-top: 0;
+    color: #4b5563;
+    font-size: 0.95rem;
+}
+
+.seccion-tabla {
+    padding: 0 20px 40px 20px;
+    overflow-x: auto;
+}
+
+.tabla-cripto {
+    display: grid;
+    grid-template-columns: 30px 2.5fr 1fr 0.8fr 0.8fr 0.8fr 1.5fr 1.5fr; 
+    gap: 12px 10px;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    align-items: center;
+    min-width: 900px;
+}
+
+.encabezado-tabla {
+    font-weight: bold;
+    color: #6b7280;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.nombre-moneda {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.icono-crypto {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    border-radius: 50%;
+}
+
+.nombre-moneda span {
+    color: #6b7280;
+    font-size: 0.85rem;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #ffffff;
+    color: #6b7280;
+    border-top: 1px solid #e5e7eb;
+}
+
+@media (max-width: 768px) {
+    header nav {
+        display: none;
+    }
+    
+    .boton-consultar {
+        display: none;
+    }
+}
