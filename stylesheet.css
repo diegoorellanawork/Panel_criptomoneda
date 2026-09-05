@@ -79,6 +79,11 @@ nav ul li a:hover {
     color: #25c200;
 }
 
+.enlace-nav.enlace-activo {
+    color: #25c200;
+    font-weight: 600;
+}
+
 .acciones-encabezado {
     display: flex;
     align-items: center;
@@ -108,6 +113,8 @@ nav ul li a:hover {
     font-weight: 600;
     font-size: 0.88rem;
     transition: background-color 0.2s ease;
+    border: none;
+    cursor: pointer;
 }
 
 .boton-aplicacion:hover {
@@ -231,9 +238,210 @@ footer {
 @media (max-width: 768px) {
     header nav {
         display: none;
+        width: 100%;
+        order: 3;
     }
-    
+
+    header nav.menu-abierto {
+        display: block;
+    }
+
+    header nav ul {
+        flex-direction: column;
+        gap: 12px;
+        padding: 8px 0;
+    }
+
     .boton-consultar {
         display: none;
     }
+}
+
+/* ============================
+   AÑADIDO: JavaScript - filas de la tabla
+   ============================ */
+
+/* Cada fila es un wrapper "invisible" para el grid: sus hijos
+   siguen ocupando columnas del grid como si el wrapper no existiera. */
+.fila-cripto {
+    display: contents;
+}
+
+/* Al filtrar, ocultamos la fila completa (y sus hijos) con una sola clase */
+.fila-cripto.oculta {
+    display: none;
+}
+
+.contador-resultados {
+    color: #6b7280;
+    font-size: 0.85rem;
+    margin: 8px 0 16px 0;
+}
+
+.sin-resultados {
+    display: none;
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #6b7280;
+    padding: 20px 0;
+}
+
+.sin-resultados.visible {
+    display: block;
+}
+
+/* ============================
+   AÑADIDO: JavaScript - botón de favoritos
+   ============================ */
+
+.boton-favorito {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: #9ca3af;
+    padding: 0;
+    line-height: 1;
+    transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.boton-favorito:hover {
+    transform: scale(1.15);
+}
+
+.boton-favorito.activo {
+    color: #f59e0b;
+}
+
+.lista-favoritos {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 110px;
+    overflow-y: auto;
+}
+
+.lista-favoritos li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 4px 8px;
+}
+
+.lista-favoritos li.favorito-vacio {
+    color: #9ca3af;
+    background: transparent;
+    border: none;
+    justify-content: flex-start;
+    padding: 0;
+}
+
+.lista-favoritos .quitar-favorito {
+    background: none;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* ============================
+   AÑADIDO: JavaScript - página de portafolio (portafolio.html)
+   ============================ */
+
+.tabla-portafolio {
+    grid-template-columns: 30px 2.5fr 1fr 0.8fr 0.8fr 0.8fr 1.5fr 1.5fr 0.7fr;
+}
+
+.boton-quitar-portafolio {
+    background: none;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    color: #ef4444;
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 4px 10px;
+}
+
+.boton-quitar-portafolio:hover {
+    background-color: #fef2f2;
+    border-color: #fecaca;
+}
+
+/* ============================
+   AÑADIDO: JavaScript - formulario de alertas
+   ============================ */
+
+.seccion-alertas {
+    padding: 0 20px 40px 20px;
+    max-width: 480px;
+}
+
+.seccion-alertas h2 {
+    margin-bottom: 4px;
+}
+
+.seccion-alertas > p {
+    color: #6b7280;
+    margin-top: 0;
+    font-size: 0.9rem;
+}
+
+#formulario-alertas {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 16px;
+}
+
+.campo-formulario {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.campo-formulario label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #4b5563;
+}
+
+.campo-formulario input {
+    padding: 10px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.campo-formulario input:focus {
+    border-color: #25c200;
+}
+
+.campo-formulario input.campo-invalido {
+    border-color: #ef4444;
+}
+
+.mensaje-error {
+    color: #ef4444;
+    font-size: 0.8rem;
+    min-height: 1em;
+}
+
+#formulario-alertas .boton-aplicacion {
+    align-self: flex-start;
+}
+
+.mensaje-exito {
+    color: #10b981;
+    font-size: 0.9rem;
+    font-weight: 600;
+    min-height: 1em;
+    margin: 0;
 }

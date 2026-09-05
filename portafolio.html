@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="stylesheet.css">
+    <title>Mi Portafolio — CryptoGecko</title>
+</head>
+<body>
+    <header>
+        <div class="encabezado-superior">
+            <div class="grupo-marca">
+                <button class="boton-menu" id="boton-menu" aria-label="Abrir menú" aria-expanded="false">☰</button>
+                <div class="logo">
+                    <img src="imagenes/logo.png" alt="CryptoGecko Logo" class="imagen-logo">
+                    <span>CryptoGecko</span>
+                </div>
+            </div>
+
+            <nav id="menu-principal">
+                <ul>
+                    <li><a href="index.html" id="enlace-mercado" class="enlace-nav">Criptomonedas</a></li>
+                    <li><a href="#" class="enlace-nav">Intercambios</a></li>
+                    <li><a href="portafolio.html" id="enlace-portafolio" class="enlace-nav enlace-activo">Mi Portafolio</a></li>
+                </ul>
+            </nav>
+
+            <div class="acciones-encabezado">
+                <a href="#" class="boton-consultar">✨ Preguntar a Gecko</a>
+                <a href="#" class="boton-aplicacion">Utilizar la aplicación</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="seccion-tabla">
+            <h2>Mi Portafolio</h2>
+            <p class="contador-resultados" id="contador-portafolio"></p>
+
+            <div class="tabla-cripto tabla-portafolio" id="tabla-portafolio">
+                <div class="encabezado-tabla">#</div>
+                <div class="encabezado-tabla">Moneda</div>
+                <div class="encabezado-tabla">Precio</div>
+                <div class="encabezado-tabla">1h</div>
+                <div class="encabezado-tabla">24h</div>
+                <div class="encabezado-tabla">7d</div>
+                <div class="encabezado-tabla">Volumen 24h</div>
+                <div class="encabezado-tabla">Cap. de Mercado</div>
+                <div class="encabezado-tabla">Acciones</div>
+
+                <p class="sin-resultados visible" id="portafolio-vacio">
+                    Aún no tienes criptomonedas en tu portafolio. Ve a
+                    <a href="index.html">Criptomonedas</a> y toca la ⭐ de una moneda para agregarla aquí.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 CryptoGecko. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
