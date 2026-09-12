@@ -29,7 +29,7 @@ CryptoDash sigue una arquitectura cliente-servidor de tres capas:
 
 ### Diagrama cliente-servidor
 
-![Arquitectura cliente-servidor](docs/diagramas/arquitectura.png)
+![Arquitectura cliente-servidor](imagenes/arquitectura.png)
 
 El frontend se comunica con un backend propio construido en Node.js y Express, que expone una
 API REST sobre el recurso `criptomoneda`. El backend actúa como intermediario: consulta la API
@@ -39,7 +39,7 @@ responder al cliente.
 
 ### Flujo de datos
 
-![Flujo de datos](docs/diagramas/flujo-datos.png)
+![Flujo de datos](imagenes/flujo-datos.png)
 
 Cuando el usuario interactúa con la interfaz (clic, búsqueda o cambio de filtro), el frontend
 hace una petición `fetch()` a `/api/criptomonedas`. El backend recibe la petición, consulta
