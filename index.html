@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="stylesheet.css">
-    <title>CryptoGecko</title>
+    <title>CryptoDash — Panel de Criptomonedas</title>
 </head>
 <body>
     <header>
@@ -12,49 +12,89 @@
             <div class="grupo-marca">
                 <button class="boton-menu" id="boton-menu" aria-label="Abrir menú" aria-expanded="false">☰</button>
                 <div class="logo">
-                    <img src="imagenes/logo.png" alt="CryptoGecko Logo" class="imagen-logo">
-                    <span>CryptoGecko</span>
+                    <img src="imagenes/logo.png" alt="CryptoDash Logo" class="imagen-logo">
+                    <span>CRYPTODASH</span>
+                    <span class="etiqueta-estado">DATOS EN VIVO</span>
                 </div>
             </div>
 
             <nav id="menu-principal">
                 <ul>
-                    <li><a href="index.html" id="enlace-mercado" class="enlace-nav enlace-activo">Criptomonedas</a></li>
-                    <li><a href="#" class="enlace-nav">Intercambios</a></li>
-                    <li><a href="portafolio.html" id="enlace-portafolio" class="enlace-nav">Mi Portafolio</a></li>
+                    <li><a href="index.html" id="enlace-mercado" class="enlace-nav enlace-activo">📈 Mercado</a></li>
+                    <li><a href="portafolio.html" id="enlace-portafolio" class="enlace-nav">💼 Portafolio</a></li>
+                    <li><a href="#tarjeta-favoritos" class="enlace-nav">⭐ Lista de Seguimiento</a></li>
+                    <li><a href="intercambio.html" class="enlace-nav">🔄 Intercambio</a></li>
                 </ul>
             </nav>
 
             <div class="acciones-encabezado">
-                <a href="#" class="boton-consultar">✨ Preguntar a Gecko</a>
-                <a href="#" class="boton-aplicacion">Utilizar la aplicación</a>
+                <div class="caja-busqueda-header">
+                    <span class="icono-busqueda">🔍</span>
+                    <input type="text" id="campo-busqueda" placeholder="Buscar cripto (ej: Cardano, DOGE)...">
+                    <span class="cargando-busqueda" id="cargando-busqueda">⏳</span>
+                </div>
+
+                <div class="notificacion-wrapper">
+                    <button class="boton-icono" aria-label="Notificaciones">🔔</button>
+                    <span class="insignia-notificacion">3</span>
+                </div>
+
+                <select class="selector-fiat">
+                    <option value="USD">$ USD</option>
+                    <option value="BOB">Bs. BOB</option>
+                    <option value="EUR">€ EUR</option>
+                </select>
+
+                <a href="#" class="boton-consultar">⚙️ Ajustes</a>
+                <button class="boton-aplicacion boton-conectar">Conectar Cartera</button>
+                <div class="perfil-wallet">0x71C...39A2</div>
             </div>
         </div>
 
-        <div class="encabezado-busqueda">
-            <div class="caja-busqueda">
-                <span class="icono-busqueda">🔍</span>
-                <input type="text" id="campo-busqueda" placeholder="Buscar por nombre o símbolo...">
+        <div class="bar-metricas">
+            <div class="metrica-item">
+                <span class="metrica-titulo">Cap. de Mercado Global</span>
+                <span class="metrica-valor">$2.45T <span class="sube">(+1.1%)</span></span>
+            </div>
+            <div class="metrica-item">
+                <span class="metrica-titulo">Vol. 24h</span>
+                <span class="metrica-valor">$89.2B</span>
+            </div>
+            <div class="metrica-item">
+                <span class="metrica-titulo">Dominancia</span>
+                <span class="metrica-valor">BTC 51.3% | ETH 17.8%</span>
+            </div>
+            <div class="metrica-item">
+                <span class="metrica-titulo">Gas</span>
+                <span class="metrica-valor">28 Gwei</span>
+            </div>
+            <div class="metrica-item">
+                <span class="metrica-titulo">Miedo y Avaricia</span>
+                <span class="metrica-valor sube">65 (Avaricia) ⚖️</span>
             </div>
         </div>
     </header>
 
     <main>
+        <section class="seccion-grafico">
+            <div class="tarjeta-grafico">
+                <div class="encabezado-grafico">
+                    <h3 id="titulo-grafico">Bitcoin (BTC) — Historial de Precio</h3>
+                    <div class="filtros-tiempo" id="filtros-tiempo">
+                        <button class="boton-tiempo" data-dias="1">24h</button>
+                        <button class="boton-tiempo activo" data-dias="7">7d</button>
+                        <button class="boton-tiempo" data-dias="30">30d</button>
+                    </div>
+                </div>
+                <div class="contenedor-canvas">
+                    <canvas id="grafico-precio"></canvas>
+                </div>
+            </div>
+        </section>
+
         <section class="mercado">
-            <div class="tarjeta">
-                <h3>Cap. de Mercado Global</h3>
-                <p>$2.7T <span class="sube">+1.4%</span></p>
-            </div>
-            <div class="tarjeta">
-                <h3>Volumen 24h</h3>
-                <p>$92.8B</p>
-            </div>
-            <div class="tarjeta">
-                <h3>Dominancia</h3>
-                <p>BTC: 57.2% | ETH: 10.9%</p>
-            </div>
             <div class="tarjeta" id="tarjeta-favoritos">
-                <h3>Mis Favoritos (<span id="contador-favoritos">0</span>)</h3>
+                <h3>⭐ Lista de Seguimiento (<span id="contador-favoritos">0</span>)</h3>
                 <ul class="lista-favoritos" id="lista-favoritos">
                     <li class="favorito-vacio">Toca la ⭐ de una moneda para agregarla aquí</li>
                 </ul>
@@ -62,7 +102,7 @@
         </section>
 
         <section class="seccion-tabla">
-            <h2>Precios de Criptomonedas por Capitalización de Mercado</h2>
+            <h2>Precios de Criptomonedas en Vivo</h2>
             <p class="contador-resultados" id="contador-resultados"></p>
 
             <div class="tabla-cripto" id="tabla-cripto">
@@ -74,141 +114,6 @@
                 <div class="encabezado-tabla">7d</div>
                 <div class="encabezado-tabla">Volumen 24h</div>
                 <div class="encabezado-tabla">Cap. de Mercado</div>
-
-                <div class="fila-cripto" data-nombre="Bitcoin" data-simbolo="BTC">
-                    <div>1</div>
-                    <div class="nombre-moneda">
-                        <button class="boton-favorito" data-moneda="Bitcoin" aria-label="Agregar Bitcoin a favoritos">☆</button>
-                        <img src="imagenes/btc.png" alt="Bitcoin" class="icono-crypto">
-                        <strong>Bitcoin</strong> <span>BTC</span>
-                    </div>
-                    <div>$77,515.70</div>
-                    <div class="sube">▲ 0.1%</div>
-                    <div class="baja">▼ 3.2%</div>
-                    <div class="sube">▲ 0.6%</div>
-                    <div>$36,224,786,411</div>
-                    <div>$1,556,024,920,950</div>
-                </div>
-
-                <div class="fila-cripto" data-nombre="Ethereum" data-simbolo="ETH">
-                    <div>2</div>
-                    <div class="nombre-moneda">
-                        <button class="boton-favorito" data-moneda="Ethereum" aria-label="Agregar Ethereum a favoritos">☆</button>
-                        <img src="imagenes/eth.png" alt="Ethereum" class="icono-crypto">
-                        <strong>Ethereum</strong> <span>ETH</span>
-                    </div>
-                    <div>$2,434.05</div>
-                    <div class="sube">▲ 0.4%</div>
-                    <div class="baja">▼ 2.8%</div>
-                    <div class="sube">▲ 0.7%</div>
-                    <div>$15,033,305,690</div>
-                    <div>$293,698,634,331</div>
-                </div>
-
-                <div class="fila-cripto" data-nombre="Tether" data-simbolo="USDT">
-                    <div>3</div>
-                    <div class="nombre-moneda">
-                        <button class="boton-favorito" data-moneda="Tether" aria-label="Agregar Tether a favoritos">☆</button>
-                        <img src="imagenes/usdt.png" alt="Tether" class="icono-crypto">
-                        <strong>Tether</strong> <span>USDT</span>
-                    </div>
-                    <div>$0.9999</div>
-                    <div class="sube">▲ 0.0%</div>
-                    <div class="sube">▲ 0.0%</div>
-                    <div class="sube">▲ 0.0%</div>
-                    <div>$64,855,896,554</div>
-                    <div>$183,336,121,410</div>
-                </div>
-
-                <div class="fila-cripto" data-nombre="BNB" data-simbolo="BNB">
-                    <div>4</div>
-                    <div class="nombre-moneda">
-                        <button class="boton-favorito" data-moneda="BNB" aria-label="Agregar BNB a favoritos">☆</button>
-                        <img src="imagenes/bnb.png" alt="BNB" class="icono-crypto">
-                        <strong>BNB</strong> <span>BNB</span>
-                    </div>
-                    <div>$689.09</div>
-                    <div class="sube">▲ 0.2%</div>
-                    <div class="baja">▼ 3.1%</div>
-                    <div class="sube">▲ 1.9%</div>
-                    <div>$894,853,445</div>
-                    <div>$91,722,505,685</div>
-                </div>
-
-                <div class="fila-cripto" data-nombre="XRP" data-simbolo="XRP">
-                    <div>5</div>
-                    <div class="nombre-moneda">
-                        <button class="boton-favorito" data-moneda="XRP" aria-label="Agregar XRP a favoritos">☆</button>
-                        <img src="imagenes/xrp.png" alt="XRP" class="icono-crypto">
-                        <strong>XRP</strong> <span>XRP</span>
-                    </div>
-                    <div>$1.38</div>
-                    <div class="sube">▲ 0.9%</div>
-                    <div class="baja">▼ 4.8%</div>
-                    <div class="sube">▲ 0.3%</div>
-                    <div>$3,047,708,323</div>
-                    <div>$86,741,247,446</div>
-                </div>
-
-                <div class="fila-cripto" data-nombre="USDC" data-simbolo="USDC">
-                    <div>6</div>
-                    <div class="nombre-moneda">
-                        <button class="boton-favorito" data-moneda="USDC" aria-label="Agregar USDC a favoritos">☆</button>
-                        <img src="imagenes/usdc.png" alt="USDC" class="icono-crypto">
-                        <strong>USDC</strong> <span>USDC</span>
-                    </div>
-                    <div>$0.9999</div>
-                    <div class="sube">▲ 0.0%</div>
-                    <div class="sube">▲ 0.0%</div>
-                    <div class="sube">▲ 0.0%</div>
-                    <div>$19,170,400,349</div>
-                    <div>$73,803,333,296</div>
-                </div>
-
-                <div class="fila-cripto" data-nombre="Solana" data-simbolo="SOL">
-                    <div>7</div>
-                    <div class="nombre-moneda">
-                        <button class="boton-favorito" data-moneda="Solana" aria-label="Agregar Solana a favoritos">☆</button>
-                        <img src="imagenes/sol.png" alt="Solana" class="icono-crypto">
-                        <strong>Solana</strong> <span>SOL</span>
-                    </div>
-                    <div>$103.44</div>
-                    <div class="sube">▲ 0.8%</div>
-                    <div class="baja">▼ 4.5%</div>
-                    <div class="sube">▲ 13.1%</div>
-                    <div>$6,103,883,108</div>
-                    <div>$60,401,858,714</div>
-                </div>
-
-                <div class="fila-cripto" data-nombre="TRON" data-simbolo="TRX">
-                    <div>8</div>
-                    <div class="nombre-moneda">
-                        <button class="boton-favorito" data-moneda="TRON" aria-label="Agregar TRON a favoritos">☆</button>
-                        <img src="imagenes/trx.png" alt="TRON" class="icono-crypto">
-                        <strong>TRON</strong> <span>TRX</span>
-                    </div>
-                    <div>$0.3413</div>
-                    <div class="sube">▲ 0.4%</div>
-                    <div class="sube">▲ 1.1%</div>
-                    <div class="sube">▲ 0.3%</div>
-                    <div>$521,033,832</div>
-                    <div>$32,398,329,536</div>
-                </div>
-
-                <div class="fila-cripto" data-nombre="Figure Heloc" data-simbolo="FIGR_HELOC">
-                    <div>9</div>
-                    <div class="nombre-moneda">
-                        <button class="boton-favorito" data-moneda="Figure Heloc" aria-label="Agregar Figure Heloc a favoritos">☆</button>
-                        <img src="imagenes/figr.png" alt="Figure Heloc" class="icono-crypto">
-                        <strong>Figure Heloc</strong> <span>FIGR_HELOC</span>
-                    </div>
-                    <div>$1.04</div>
-                    <div class="sube">▲ 0.0%</div>
-                    <div class="sube">▲ 3.5%</div>
-                    <div class="sube">▲ 1.1%</div>
-                    <div>$489,997,966</div>
-                    <div>$22,581,047,546</div>
-                </div>
 
                 <p class="sin-resultados" id="sin-resultados">No se encontraron criptomonedas que coincidan con tu búsqueda.</p>
             </div>
@@ -238,9 +143,10 @@
     </main>
 
     <footer>
-        <p>&copy; 2026 CryptoGecko. Todos los derechos reservados.</p>
+        <p>&copy; 2026 CryptoDash. Todos los derechos reservados.</p>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

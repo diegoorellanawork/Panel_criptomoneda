@@ -1,27 +1,20 @@
 // ============================================================
-// app.js — CryptoGecko
-// Interactividad, DOM, formulario, menú y conexión con la API
-// de CoinGecko para precios en vivo
+// app.js — CryptoDash
+// Buscador global dinámico, gráfico con Chart.js y consumo de CoinGecko API
 // ============================================================
 
-// 👉 PEGA AQUÍ TU API KEY GRATUITA (Demo plan) DE COINGECKO.
-// La consigues en https://www.coingecko.com/en/api/pricing
 const CONFIGURACION_API = {
   clave: 'CG-ZJ6Egw2fyZpsEC9hewHSXAfE',
-  cantidadMonedas: 9,
+  cantidadInicial: 10,
 };
 
-// Clave usada en localStorage para que los favoritos sobrevivan al
-// navegar entre index.html y portafolio.html (son documentos distintos,
-// así que una variable en memoria no alcanza).
 const CLAVE_ALMACENAMIENTO = 'cryptogecko_favoritos';
-
-// Estado global de favoritos: Map<nombreMoneda, datosFila>.
-// Guardamos los datos (precio, cambios, volumen, etc.) y no solo el
-// nombre, porque la tabla de "Mi Portafolio" necesita pintarlos sin
-// depender de que la fila original siga en el DOM (y, en portafolio.html,
-// la fila original ni siquiera existe en esa página).
 const favoritos = cargarFavoritosGuardados();
+
+let miGrafico = null;
+let monedaGraficoActual = 'bitcoin';
+let diasGraficoActual = 7;
+let temporizadorBusqueda = null;
 
 function cargarFavoritosGuardados() {
   try {
@@ -29,7 +22,7 @@ function cargarFavoritosGuardados() {
     if (!guardado) return new Map();
     return new Map(Object.entries(JSON.parse(guardado)));
   } catch (error) {
-    console.error('No se pudieron leer los favoritos guardados:', error);
+    console.error('Error al leer favoritos guardados:', error);
     return new Map();
   }
 }
@@ -38,33 +31,31 @@ function guardarFavoritos() {
   try {
     localStorage.setItem(CLAVE_ALMACENAMIENTO, JSON.stringify(Object.fromEntries(favoritos)));
   } catch (error) {
-    console.error('No se pudieron guardar los favoritos:', error);
+    console.error('Error al guardar favoritos:', error);
   }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   inicializarMenu();
-  inicializarBuscador();
+  inicializarBuscadorDinamico();
   inicializarFavoritos();
   inicializarFormularioAlertas();
-  cargarPreciosDesdeAPI();
+  inicializarEventosGrafico();
+  cargarTopMercado();
   aplicarEstadoFavoritosInicial();
+  
+  renderizarGrafico(monedaGraficoActual, diasGraficoActual);
 });
 
-// Al cargar cualquiera de las dos páginas, refleja los favoritos que ya
-// estaban guardados: marca las ☆ correspondientes en la tabla de precios
-// (si estamos en index.html) y pinta la tabla de "Mi Portafolio" (si
-// estamos en portafolio.html).
 function aplicarEstadoFavoritosInicial() {
   const contadorFavoritos = document.getElementById('contador-favoritos');
   if (contadorFavoritos) contadorFavoritos.textContent = favoritos.size;
   renderizarListaFavoritos();
-  sincronizarFavoritosConFilas();
   renderizarTablaPortafolio();
 }
 
 // ------------------------------------------------------------
-// 1. INTERACTIVIDAD: menú hamburguesa que se abre y se cierra
+// 1. MENÚ
 // ------------------------------------------------------------
 function inicializarMenu() {
   const botonMenu = document.getElementById('boton-menu');
@@ -79,36 +70,72 @@ function inicializarMenu() {
 }
 
 // ------------------------------------------------------------
-// 2. MANIPULACIÓN DEL DOM: buscador que filtra la tabla en vivo
-//    (vuelve a leer las filas en cada tecla, así funciona con
-//    los datos de ejemplo Y con los datos reales de la API)
+// 2. BUSCADOR GLOBAL DINÁMICO (CoinGecko Search API)
 // ------------------------------------------------------------
-function inicializarBuscador() {
+function inicializarBuscadorDinamico() {
   const campoBusqueda = document.getElementById('campo-busqueda');
-  const mensajeSinResultados = document.getElementById('sin-resultados');
-  const tablaCripto = document.getElementById('tabla-cripto');
-  if (!campoBusqueda || !tablaCripto) return;
-
-  actualizarContadorResultados();
+  const indicadorCargando = document.getElementById('cargando-busqueda');
+  if (!campoBusqueda) return;
 
   campoBusqueda.addEventListener('input', () => {
+    clearTimeout(temporizadorBusqueda);
     const texto = campoBusqueda.value.trim().toLowerCase();
-    const filas = tablaCripto.querySelectorAll('.fila-cripto');
-    let visibles = 0;
 
-    filas.forEach((fila) => {
-      const nombre = fila.dataset.nombre.toLowerCase();
-      const simbolo = fila.dataset.simbolo.toLowerCase();
-      const coincide = nombre.includes(texto) || simbolo.includes(texto);
-      fila.classList.toggle('oculta', !coincide);
-      if (coincide) visibles++;
-    });
-
-    actualizarContadorResultados();
-    if (mensajeSinResultados) {
-      mensajeSinResultados.classList.toggle('visible', visibles === 0);
+    if (texto === '') {
+      if (indicadorCargando) indicadorCargando.classList.remove('activo');
+      cargarTopMercado();
+      return;
     }
+
+    if (indicadorCargando) indicadorCargando.classList.add('activo');
+
+    // Debounce de 400ms para evitar llamadas excesivas a la API
+    temporizadorBusqueda = setTimeout(() => {
+      ejecutarBusquedaGlobal(texto);
+    }, 400);
   });
+}
+
+async function ejecutarBusquedaGlobal(query) {
+  const indicadorCargando = document.getElementById('cargando-busqueda');
+  const urlSearch = `https://api.coingecko.com/api/v3/search?query=${encodeURIComponent(query)}&x_cg_demo_api_key=${CONFIGURACION_API.clave}`;
+
+  try {
+    const res = await fetch(urlSearch);
+    if (!res.ok) throw new Error('Error al buscar monedas');
+    const data = await res.json();
+
+    if (!data.coins || data.coins.length === 0) {
+      mostrarSinResultados();
+      return;
+    }
+
+    // Obtener los primeros 10 IDs encontrados
+    const idsEncontrados = data.coins.slice(0, 10).map((c) => c.id).join(',');
+    
+    // Consultar sus precios actuales en vivo
+    const urlMarkets = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${idsEncontrados}&price_change_percentage=1h,24h,7d&x_cg_demo_api_key=${CONFIGURACION_API.clave}`;
+    const resMarkets = await fetch(urlMarkets);
+    const datosMercado = await resMarkets.json();
+
+    reemplazarFilasConDatosReales(datosMercado);
+  } catch (error) {
+    console.error('Error durante la búsqueda global:', error);
+    mostrarSinResultados();
+  } finally {
+    if (indicadorCargando) indicadorCargando.classList.remove('activo');
+  }
+}
+
+function mostrarSinResultados() {
+  const tabla = document.getElementById('tabla-cripto');
+  const mensajeSinResultados = document.getElementById('sin-resultados');
+  const contadorResultados = document.getElementById('contador-resultados');
+  if (!tabla) return;
+
+  tabla.querySelectorAll('.fila-cripto').forEach((fila) => fila.remove());
+  if (mensajeSinResultados) mensajeSinResultados.classList.add('visible');
+  if (contadorResultados) contadorResultados.textContent = 'Mostrando 0 resultados';
 }
 
 function actualizarContadorResultados() {
@@ -116,18 +143,106 @@ function actualizarContadorResultados() {
   const tablaCripto = document.getElementById('tabla-cripto');
   if (!contadorResultados || !tablaCripto) return;
   const total = tablaCripto.querySelectorAll('.fila-cripto').length;
-  const visibles = tablaCripto.querySelectorAll('.fila-cripto:not(.oculta)').length;
-  contadorResultados.textContent = `Mostrando ${visibles} de ${total} criptomonedas`;
+  contadorResultados.textContent = `Mostrando ${total} resultados`;
 }
 
 // ------------------------------------------------------------
-// 3. DOM + CONTADOR: favoritos (⭐) con lista dinámica.
-//    Usa delegación de eventos en la tabla, así los botones
-//    que crea la API (después del fetch) también funcionan.
+// 3. GRÁFICO (Chart.js)
+// ------------------------------------------------------------
+function inicializarEventosGrafico() {
+  const tablaCripto = document.getElementById('tabla-cripto');
+  const contenedorFiltros = document.getElementById('filtros-tiempo');
+
+  if (tablaCripto) {
+    tablaCripto.addEventListener('click', (evento) => {
+      if (evento.target.closest('.boton-favorito')) return;
+      const fila = evento.target.closest('.fila-cripto');
+      if (!fila) return;
+
+      const idMoneda = fila.dataset.id;
+      const nombreMoneda = fila.dataset.nombre;
+      const simboloMoneda = fila.dataset.simbolo;
+
+      monedaGraficoActual = idMoneda;
+      const titulo = document.getElementById('titulo-grafico');
+      if (titulo) titulo.textContent = `${nombreMoneda} (${simboloMoneda}) — Historial de Precio`;
+
+      renderizarGrafico(monedaGraficoActual, diasGraficoActual);
+    });
+  }
+
+  if (contenedorFiltros) {
+    contenedorFiltros.addEventListener('click', (evento) => {
+      const boton = evento.target.closest('.boton-tiempo');
+      if (!boton) return;
+
+      contenedorFiltros.querySelectorAll('.boton-tiempo').forEach((b) => b.classList.remove('activo'));
+      boton.classList.add('activo');
+
+      diasGraficoActual = parseInt(boton.dataset.dias, 10);
+      renderizarGrafico(monedaGraficoActual, diasGraficoActual);
+    });
+  }
+}
+
+async function renderizarGrafico(idMoneda = 'bitcoin', dias = 7) {
+  const canvas = document.getElementById('grafico-precio');
+  if (!canvas || typeof Chart === 'undefined') return;
+
+  const url = `https://api.coingecko.com/api/v3/coins/${idMoneda}/market_chart?vs_currency=usd&days=${dias}&x_cg_demo_api_key=${CONFIGURACION_API.clave}`;
+
+  try {
+    const respuesta = await fetch(url);
+    if (!respuesta.ok) throw new Error(`HTTP error ${respuesta.status}`);
+    const datos = await respuesta.json();
+
+    const etiquetas = datos.prices.map((p) => {
+      const fecha = new Date(p[0]);
+      return dias === 1 ? fecha.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : fecha.toLocaleDateString();
+    });
+
+    const precios = datos.prices.map((p) => p[1]);
+
+    if (miGrafico) miGrafico.destroy();
+
+    const ctx = canvas.getContext('2d');
+    miGrafico = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: etiquetas,
+        datasets: [{
+          label: 'Precio USD',
+          data: precios,
+          borderColor: '#2563eb',
+          backgroundColor: 'rgba(37, 99, 235, 0.1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.3,
+          pointRadius: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { color: '#262c3a' }, ticks: { color: '#6b7280' } },
+          y: { grid: { color: '#262c3a' }, ticks: { color: '#6b7280' } }
+        }
+      }
+    });
+  } catch (error) {
+    console.error('No se pudo cargar la información del gráfico:', error);
+  }
+}
+
+// ------------------------------------------------------------
+// 4. FAVORITOS
 // ------------------------------------------------------------
 function inicializarFavoritos() {
   const tabla = document.getElementById('tabla-cripto');
   const tablaPortafolio = document.getElementById('tabla-portafolio');
+
   if (tabla) {
     tabla.addEventListener('click', (evento) => {
       const boton = evento.target.closest('.boton-favorito');
@@ -136,7 +251,6 @@ function inicializarFavoritos() {
     });
   }
 
-  // Botón "Quitar" dentro de la propia tabla de portafolio
   if (tablaPortafolio) {
     tablaPortafolio.addEventListener('click', (evento) => {
       const boton = evento.target.closest('.boton-quitar-portafolio');
@@ -146,9 +260,6 @@ function inicializarFavoritos() {
   }
 }
 
-// Lee los valores ya renderizados de una fila (precio, cambios, volumen...)
-// para poder reconstruir esa misma fila dentro de "Mi Portafolio" sin
-// tener que volver a pedir nada a la API.
 function extraerDatosFila(fila) {
   const columnas = fila.children;
   return {
@@ -173,11 +284,9 @@ function alternarFavorito(moneda, datosFila) {
       boton.classList.remove('activo');
     }
   } else {
-    // Si no nos pasaron los datos directamente, los tomamos de la fila
-    // de la tabla de precios que disparó el clic.
     const fila = boton ? boton.closest('.fila-cripto') : null;
     const datos = datosFila || (fila ? extraerDatosFila(fila) : null);
-    if (!datos) return; // sin datos de la moneda no hay nada que mostrar en el portafolio
+    if (!datos) return;
     favoritos.set(moneda, datos);
     if (boton) {
       boton.textContent = '★';
@@ -194,7 +303,7 @@ function alternarFavorito(moneda, datosFila) {
 
 function renderizarListaFavoritos() {
   const listaFavoritos = document.getElementById('lista-favoritos');
-  if (!listaFavoritos) return; // esta tarjeta solo existe en index.html
+  if (!listaFavoritos) return;
   listaFavoritos.innerHTML = '';
 
   if (favoritos.size === 0) {
@@ -207,7 +316,6 @@ function renderizarListaFavoritos() {
 
   favoritos.forEach((_datos, moneda) => {
     const item = document.createElement('li');
-
     const nombre = document.createElement('span');
     nombre.textContent = `⭐ ${moneda}`;
 
@@ -223,10 +331,6 @@ function renderizarListaFavoritos() {
   });
 }
 
-// ------------------------------------------------------------
-// TABLA "MI PORTAFOLIO": misma estructura que la tabla de precios,
-// pero solo con las monedas marcadas como favoritas.
-// ------------------------------------------------------------
 function renderizarTablaPortafolio() {
   const tabla = document.getElementById('tabla-portafolio');
   const vacio = document.getElementById('portafolio-vacio');
@@ -274,28 +378,19 @@ function renderizarTablaPortafolio() {
   });
 }
 
-// Cuando la API reemplaza las filas de ejemplo por datos reales, los
-// botones de favorito nuevos nacen todos en ☆. Esta función busca, por
-// nombre, las monedas que ya estaban marcadas y les devuelve su estado
-// (y refresca sus datos guardados con los valores reales de la API).
 function sincronizarFavoritosConFilas() {
   if (favoritos.size === 0) return;
 
   favoritos.forEach((_datosViejos, moneda) => {
     const boton = document.querySelector(`.boton-favorito[data-moneda="${CSS.escape(moneda)}"]`);
-    if (!boton) return; // esa moneda ya no aparece en la tabla actual (p. ej. salió del top N)
+    if (!boton) return;
     boton.textContent = '★';
     boton.classList.add('activo');
-    const fila = boton.closest('.fila-cripto');
-    if (fila) favoritos.set(moneda, extraerDatosFila(fila));
   });
-
-  guardarFavoritos();
-  renderizarTablaPortafolio();
 }
 
 // ------------------------------------------------------------
-// 4. VALIDACIÓN DE FORMULARIO: alertas de precio
+// 5. FORMULARIO
 // ------------------------------------------------------------
 function inicializarFormularioAlertas() {
   const formulario = document.getElementById('formulario-alertas');
@@ -335,7 +430,7 @@ function inicializarFormularioAlertas() {
       marcarError(campoCorreo, errorCorreo, 'Por favor ingresa tu correo.');
       esValido = false;
     } else if (!patronCorreo.test(correo)) {
-      marcarError(campoCorreo, errorCorreo, 'Ingresa un correo válido, ej: nombre@dominio.com');
+      marcarError(campoCorreo, errorCorreo, 'Ingresa un correo válido.');
       esValido = false;
     } else {
       limpiarError(campoCorreo, errorCorreo);
@@ -349,32 +444,21 @@ function inicializarFormularioAlertas() {
 }
 
 // ------------------------------------------------------------
-// 5. CONEXIÓN CON LA API DE COINGECKO
+// 6. CARGAR TOP MERCADO
 // ------------------------------------------------------------
-async function cargarPreciosDesdeAPI() {
-  if (!CONFIGURACION_API.clave || CONFIGURACION_API.clave === 'TU_API_KEY_AQUI') {
-    console.warn(
-      'CryptoGecko: agrega tu API key gratuita de CoinGecko en CONFIGURACION_API.clave ' +
-      '(arriba de app.js) para mostrar precios en vivo. Mientras tanto se muestran los ' +
-      'datos de ejemplo que ya están en el HTML.'
-    );
-    return;
-  }
-
+async function cargarTopMercado() {
   const url =
     'https://api.coingecko.com/api/v3/coins/markets' +
-    `?vs_currency=usd&order=market_cap_desc&per_page=${CONFIGURACION_API.cantidadMonedas}` +
+    `?vs_currency=usd&order=market_cap_desc&per_page=${CONFIGURACION_API.cantidadInicial}` +
     `&page=1&price_change_percentage=1h,24h,7d&x_cg_demo_api_key=${CONFIGURACION_API.clave}`;
 
   try {
     const respuesta = await fetch(url);
-    if (!respuesta.ok) {
-      throw new Error(`CoinGecko respondió con estado ${respuesta.status}`);
-    }
+    if (!respuesta.ok) throw new Error(`CoinGecko respondió con estado ${respuesta.status}`);
     const monedas = await respuesta.json();
     reemplazarFilasConDatosReales(monedas);
   } catch (error) {
-    console.error('No se pudieron cargar los precios en vivo, se mantienen los datos de ejemplo:', error);
+    console.error('No se pudieron cargar los precios iniciales:', error);
   }
 }
 
@@ -383,14 +467,16 @@ function reemplazarFilasConDatosReales(monedas) {
   const mensajeSinResultados = document.getElementById('sin-resultados');
   if (!tabla) return;
 
-  // Quita las filas de ejemplo antes de dibujar las reales
   tabla.querySelectorAll('.fila-cripto').forEach((fila) => fila.remove());
+
+  if (mensajeSinResultados) mensajeSinResultados.classList.remove('visible');
 
   monedas.forEach((moneda, indice) => {
     const fila = document.createElement('div');
     fila.className = 'fila-cripto';
     fila.dataset.nombre = moneda.name;
     fila.dataset.simbolo = moneda.symbol.toUpperCase();
+    fila.dataset.id = moneda.id;
 
     fila.innerHTML = `
       <div>${indice + 1}</div>
@@ -419,6 +505,7 @@ function reemplazarFilasConDatosReales(monedas) {
 }
 
 function formatearPrecio(valor) {
+  if (valor === undefined || valor === null) return '—';
   const decimales = valor < 1 ? 4 : 2;
   return '$' + Number(valor).toLocaleString('en-US', {
     minimumFractionDigits: decimales,
@@ -427,6 +514,7 @@ function formatearPrecio(valor) {
 }
 
 function formatearMonto(valor) {
+  if (valor === undefined || valor === null) return '—';
   return '$' + Number(valor).toLocaleString('en-US');
 }
 

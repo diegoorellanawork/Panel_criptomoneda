@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="stylesheet.css">
-    <title>Mi Portafolio — CryptoGecko</title>
+    <title>Mi Portafolio — CryptoDash</title>
 </head>
 <body>
     <header>
@@ -12,22 +12,36 @@
             <div class="grupo-marca">
                 <button class="boton-menu" id="boton-menu" aria-label="Abrir menú" aria-expanded="false">☰</button>
                 <div class="logo">
-                    <img src="imagenes/logo.png" alt="CryptoGecko Logo" class="imagen-logo">
-                    <span>CryptoGecko</span>
+                    <img src="imagenes/logo.png" alt="CryptoDash Logo" class="imagen-logo">
+                    <span>CRYPTODASH</span>
+                    <span class="etiqueta-estado">DATOS EN VIVO</span>
                 </div>
             </div>
 
             <nav id="menu-principal">
                 <ul>
-                    <li><a href="index.html" id="enlace-mercado" class="enlace-nav">Criptomonedas</a></li>
-                    <li><a href="#" class="enlace-nav">Intercambios</a></li>
-                    <li><a href="portafolio.html" id="enlace-portafolio" class="enlace-nav enlace-activo">Mi Portafolio</a></li>
+                    <li><a href="index.html" id="enlace-mercado" class="enlace-nav">📈 Mercado</a></li>
+                    <li><a href="portafolio.html" id="enlace-portafolio" class="enlace-nav enlace-activo">💼 Portafolio</a></li>
+                    <li><a href="index.html#tarjeta-favoritos" class="enlace-nav">⭐ Lista de Seguimiento</a></li>
+                    <li><a href="#" class="enlace-nav">🔄 Intercambio</a></li>
                 </ul>
             </nav>
 
             <div class="acciones-encabezado">
-                <a href="#" class="boton-consultar">✨ Preguntar a Gecko</a>
-                <a href="#" class="boton-aplicacion">Utilizar la aplicación</a>
+                <div class="notificacion-wrapper">
+                    <button class="boton-icono" aria-label="Notificaciones">🔔</button>
+                    <span class="insignia-notificacion">3</span>
+                </div>
+
+                <select class="selector-fiat">
+                    <option value="USD">$ USD</option>
+                    <option value="BOB">Bs. BOB</option>
+                    <option value="EUR">€ EUR</option>
+                </select>
+
+                <a href="#" class="boton-consultar">⚙️ Ajustes</a>
+                <button class="boton-aplicacion boton-conectar">Conectar Cartera</button>
+                <div class="perfil-wallet">0x71C...39A2</div>
             </div>
         </div>
     </header>
@@ -57,7 +71,7 @@
     </main>
 
     <footer>
-        <p>&copy; 2026 CryptoGecko. Todos los derechos reservados.</p>
+        <p>&copy; 2026 CryptoDash. Todos los derechos reservados.</p>
     </footer>
 
     <script src="app.js"></script>
