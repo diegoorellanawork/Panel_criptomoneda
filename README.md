@@ -1,4 +1,4 @@
-# CryptoDash — Panel de Criptomonedas
+# Panel de Criptomonedas
 
 Panel web para el seguimiento de criptomonedas en tiempo real: precios, gráficos históricos,
 lista de seguimiento (favoritos) y portafolio personal.
